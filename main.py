@@ -36,7 +36,12 @@ judged on which letter lands fuller and more alive.
 
 import os
 
-LETTER = "A"
+# The two valid answers, each naming the drink it stands for.
+CHOICES = {"A": "coffee", "B": "tea"}
+
+# The drink this entry stands for, and the letter that names it.
+DRINK = "coffee"
+LETTER = next(letter for letter, drink in CHOICES.items() if drink == DRINK)
 
 
 def main() -> None:
@@ -53,9 +58,12 @@ def main() -> None:
     # readable by everyone. Never chmod /output itself.
     os.chmod(path, 0o644)
     # Verify the written letter by reading it back: the entry on
-    # disk must be exactly the letter this program produced.
-    with open(path, encoding="utf-8") as f:
-        assert f.read() == text, "written letter differs from the letter"
+    # disk must be exactly the letter this program produced, one
+    # byte, no trailing newline, nothing else.
+    with open(path, "rb") as f:
+        raw = f.read()
+    assert raw == text.encode("utf-8"), "written letter differs from the letter"
+    assert len(raw) == 1, f"entry must be exactly one byte, got {len(raw)}"
     print(text)
 
 
